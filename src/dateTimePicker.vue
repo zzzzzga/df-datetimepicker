@@ -237,17 +237,12 @@ export default {
         this.date = new Date()
         this.date_ = new Date()
       } else {
-        try {
-          this.date = new Date(this.dateStr)
-          if ('Invalid Date' === this.date.toString()) {
-            this.date = new Date()
-            this.date_ = new Date()
-          } else {
-             this.date_ = new Date(this.date)
-          }
-        }catch (e) {
+        this.date = new Date(this.dateStr)
+        if ('Invalid Date' === this.date.toString()) {
           this.date = new Date()
           this.date_ = new Date()
+        } else {
+            this.date_ = new Date(this.date)
         }
       }
       this.isShow = true
