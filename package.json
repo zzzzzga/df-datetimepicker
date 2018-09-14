@@ -1,15 +1,20 @@
 {
-  "name": "my_datetimepicker",
+  "name": "df_datetimepicker",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/test.min.js",
+  "main": "dist/bundle.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cross-env NODE_ENV=production webpack",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --config webpack.example.config.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "zzzzzga",
+  "license": "MIT",
+  "bugs": "https://github.com/zzzzzga/df-datetimepicker/issues",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/npm/cli.git"
+  },
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-core": "^6.26.3",

@@ -7,7 +7,6 @@ const config = {
   entry: "./example/index.js",
   output: {
     path: path.resolve(__dirname, './dist'),//输出路径，就是上步骤中新建的dist目录，
-    publicPath: '/dist/',
     filename: 'bundle.min.js',
     libraryTarget: 'umd',
     umdNamedDefine: true
