@@ -1,6 +1,6 @@
 {
   "name": "df_datetimepicker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/bundle.min.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "bugs": "https://github.com/zzzzzga/df-datetimepicker/issues",
   "repository": {
     "type" : "git",
-    "url" : "https://github.com/npm/cli.git"
+    "url" : "https://github.com/zzzzzga/df-datetimepicker"
   },
   "devDependencies": {
     "babel": "^6.23.0",
