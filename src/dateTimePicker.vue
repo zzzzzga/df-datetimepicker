@@ -1,12 +1,12 @@
 <template>
-  <div class="df-calandar">
-    <input ref="dropdownInput" :readonly="readonly" @focus="openCalandar" type="text" class="df-input" v-model="dateStr" :placeholder="placeholder" />
+  <div :class="[disabled ? 'disabled' : '']" class="df-calandar">
+    <input ref="dropdownInput" :class="[disabled ? 'disabled' : '']" class="df-input" :disabled="disabled" :readonly="readonly" @focus="openCalandar" type="text"  v-model="dateStr" :placeholder="placeholder" />
     <div ref="dropdownMenu" class="dropdown-menu" v-show="isShow">
       <div style="position: relative;">
         <div class="dropdown-header">
-          <span @click="clickLeft" class="dropdown-header_left shadow"></span>
+          <span @click="clickLeft" :class="[canPreDate?'shadow':'disabled']" class="dropdown-header_left"></span>
           <span @click="clickCenter" class="dropdown-header_center shadow">{{showTitle}}</span>
-          <span @click="clickRight" class="dropdown-header_right shadow"></span>
+          <span @click="clickRight" :class="[canNextDate?'shadow':'disabled']" class="dropdown-header_right"></span>
         </div>
         <div class="dropdown-context">
           <div v-if="status === 'date'">
@@ -17,9 +17,13 @@
                 </div>
               </div>
               <div v-else>
-                <div @click="chooseDate(day)" 
-                  :class="[dateYear === now.getFullYear() && dateMonth === now.getMonth() && day.getDate() === now.getDate() ? 'today':'',
-                  day.getFullYear() === _dateYear && day.getMonth() === _dateMonth && day.getDate() === _dateDate ? 'active':'', 'shadow', isCurrentMonth(day) ? '' : 'font-color_hui', 'date']"
+                <div @click="chooseDate(day)"
+                  :style="day.active ? '':'border-radius: 0px'"
+                  :class="[dateYear === now.getFullYear() && dateMonth === now.getMonth() 
+                  && day.getDate() === now.getDate() ? 'today':'',
+                  day.getFullYear() === _dateYear && day.getMonth() === _dateMonth 
+                  && day.getDate() === _dateDate ? 'active':'', day.active ? 'shadow' : 'disabled',
+                  isCurrentMonth(day) && day.active ? '' : 'font-color_hui', 'date']"
                     v-for="day in getCurrentLineDate(index)" :key="day.getDate()">
                     {{day.getDate()}}
                 </div>
@@ -52,7 +56,7 @@
           </div>
         </div>
         <div class="dropdown-footer">
-          <div @click="toToday" class="dropdown-today shadow">今日</div>
+          <div @click="toToday" :class="[canToday?'shadow':'disabled font-color_hui']" class="dropdown-today">今日</div>
         </div>
       </div>
     </div>
@@ -86,7 +90,12 @@ export default {
     canSelectRange: {
       type: Array,
       default: () => undefined
-    }
+    },
+    dateFormatStr: {
+      type: String,
+      default: 'yyyy年MM月dd日 hh:mm'
+    },
+    disabled: false
   },
   data () {
     return {
@@ -150,10 +159,12 @@ export default {
           this.date = new Date(this.dateYear - 10, 0, 1)
           break;
         case 'hour':
+          if (!this.canPreDate) return
           // this.date.setHours(this.dateHour - 1)
           this.date = new Date(this.date.setDate(this.dateDate - 1))
           break;
         case 'minute':
+          if (!this.canPreDate) return
           // this.date.setMinutes(this.dateMinute - 1)
           this.date = new Date(this.date.setDate(this.dateDate - 1))
           break;
@@ -173,9 +184,11 @@ export default {
           this.date = new Date(this.dateYear + 10, 0, 1)
           break;
         case 'hour':
+          if (!this.canNextDate) return
           this.date = new Date(this.date.setDate(this.dateDate + 1))
           break;
         case 'minute':
+          if (!this.canNextDate) return
           this.date = new Date(this.date.setDate(this.dateDate + 1))
           break;
         default:
@@ -211,6 +224,7 @@ export default {
       this.status = 'date'
     },
     chooseDate (day) {
+      if (!this.isRange(day)) return
       this.date = new Date(day)
       this.date_ = new Date(this.date_.setDate(this.dateDate))
       this.status = 'hour'
@@ -223,13 +237,14 @@ export default {
     chooseMinute(m) {
       this.date = new Date(this.date.setMinutes(m))
       this.date_ = new Date(this.date_.setMinutes(this.dateMinute))
-      this.dateStr = this.dateFormat(this.date, 'yyyy-MM-dd hh:mm')
+      this.dateStr = this.dateFormat(this.date, this.dateFormatStr)
       this.isShow = false
     },
     toToday () {
+      if (!this.canToday) return
       this.date = new Date()
       this.date_ = new Date()
-      this.dateStr = this.dateFormat(this.date, 'yyyy-MM-dd hh:mm')
+      this.dateStr = this.dateFormat(this.date, this.dateFormatStr)
       this.isShow = false
     },
     openCalandar () {
@@ -237,7 +252,7 @@ export default {
         this.date = new Date()
         this.date_ = new Date()
       } else {
-        this.date = new Date(this.dateStr)
+        this.date = new Date(this.dateStr.replace('年','-').replace('月','-').replace('日',''))
         if ('Invalid Date' === this.date.toString()) {
           this.date = new Date()
           this.date_ = new Date()
@@ -247,9 +262,50 @@ export default {
       }
       this.isShow = true
       this.status = 'date'
+    },
+    isRange (day) {
+      if (this.rangeBeginTime) {
+        if (day < this.rangeBeginTime) {
+          return false
+        }
+      }
+      if (this.rangeEndTime) {
+        if (day > this.rangeEndTime) {
+          return false
+        }
+      }
+      return true
     }
   },
   computed: {
+    canPreDate () {
+      if (!this.canSelectRange) return true
+      return this.isRange(new Date(this.dateYear, this.dateMonth, this.dateDate - 1))
+    },
+    canNextDate () {
+      if (!this.canSelectRange) return true
+      return this.isRange(new Date(this.dateYear, this.dateMonth, this.dateDate + 1))
+    },
+    canToday () {
+      if (!this.canSelectRange) return true
+      return this.isRange(new Date())
+    },
+    rangeBeginTime () {
+      if (this.canSelectRange && this.canSelectRange[0]) {
+        let begin = new Date(this.canSelectRange[0])
+        begin = new Date(begin.getFullYear(), begin.getMonth(), begin.getDate())
+        return begin
+      }
+      return null
+    },
+    rangeEndTime () {
+      if (this.canSelectRange && this.canSelectRange[1]) {
+        let end = new Date(this.canSelectRange[1])
+        end = new Date(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59)
+        return end
+      }
+      return null
+    },
     weeks () {
       return this.weekTip;
     },
@@ -269,6 +325,7 @@ export default {
       for (let j = 0; j < 42; j++) {
         let temT = new Date(d)
         temT.setDate(temT.getDate() + j)
+        temT.active = this.isRange(temT)
         arr.push(temT)
       }
       return arr
@@ -377,16 +434,22 @@ export default {
 <style scoped>
   .df-calandar{
     position: relative;
+    border: 1px solid #DBDBDB;
+    border-radius: 4px;
+    padding: 5px 8px;
+  }
+  .disabled {
+    cursor:not-allowed;
+    background-color: #eee;
   }
   .df-input {
     height: 20px;
-    padding: 5px 8px;
     font-size: 13px;
-    border-radius: 4px;
     outline:none;
-    border: 1px solid #DBDBDB;
+    border: none;
+    width: 100%;
   }
-  .df-input:focus {
+  .df-calandar:focus {
     border: 1px solid #145ccd;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(20,92,205,.6);
   }
@@ -402,11 +465,12 @@ export default {
   .dropdown-menu {
     position: absolute;
     min-width: 160px;
-    /* height: 200px; */
     border: 1px solid rgba(0,0,0,.2);
     margin: 1px;
     width: 190px;
     border-radius: 3px;
+    top: 35px;
+    left: 0px;
   }
   .dropdown-menu::before {
     top: -7px;
