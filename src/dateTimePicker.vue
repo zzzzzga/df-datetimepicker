@@ -66,6 +66,10 @@
 export default {
   name: 'dateTimePicker',
   props: {
+    value: {
+      type: String,
+      default: ''
+    },
     placeholder: {
       type: String,
       default: '选择日期时间'
@@ -110,6 +114,8 @@ export default {
   },
   mounted () {
     document.addEventListener('click', this.handleClose)
+    this.setDate_()
+    this.dateStr = this.value
   },
   destroyed () {
     document.removeEventListener('click', this.handleClose)
@@ -226,18 +232,31 @@ export default {
     chooseDate (day) {
       if (!this.isRange(day)) return
       this.date = new Date(day)
-      this.date_ = new Date(this.date_.setDate(this.dateDate))
+      if (this.date_) {
+        this.date_ = new Date(this.date_.setDate(this.dateDate))
+      } else {
+        this.date_ = new Date(this.date)
+      }
       this.status = 'hour'
     },
     chooseHour (h) {
       this.date = new Date(this.date.setHours(h))
-      this.date_ = new Date(this.date_.setHours(this.dateHour))
+      if (this.date_) {
+        this.date_ = new Date(this.date_.setHours(this.dateHour))
+      } else {
+        this.date_ = new Date(this.date)
+      }
       this.status = 'minute'
     },
     chooseMinute(m) {
       this.date = new Date(this.date.setMinutes(m))
-      this.date_ = new Date(this.date_.setMinutes(this.dateMinute))
+      if (this.date_) {
+        this.date_ = new Date(this.date_.setMinutes(this.dateMinute))
+      } else {
+        this.date_ = new Date(this.date)
+      }
       this.dateStr = this.dateFormat(this.date, this.dateFormatStr)
+      this.$emit('change', this.dateStr)
       this.isShow = false
     },
     toToday () {
@@ -245,17 +264,25 @@ export default {
       this.date = new Date()
       this.date_ = new Date()
       this.dateStr = this.dateFormat(this.date, this.dateFormatStr)
+      this.$emit('change', this.dateStr)
       this.isShow = false
+    },
+    setDate_ () {
+      if (this.defaultSelectNow) {
+        this.date_ = new Date()
+      } else {
+        this.date_ = null
+      }
     },
     openCalandar () {
       if (!this.dateStr) {
         this.date = new Date()
-        this.date_ = new Date()
+        this.setDate_()
       } else {
         this.date = new Date(this.dateStr.replace('年','-').replace('月','-').replace('日',''))
         if ('Invalid Date' === this.date.toString()) {
           this.date = new Date()
-          this.date_ = new Date()
+          this.setDate_()
         } else {
             this.date_ = new Date(this.date)
         }
@@ -412,20 +439,20 @@ export default {
     },
     // date 年份
     _dateYear () {
-      return this.date_.getFullYear()
+      return this.date_ ? this.date_.getFullYear() : -1
     },
     // date的月份
     _dateMonth () {
-      return this.date_.getMonth()
+      return this.date_ ? this.date_.getMonth() : -1
     },
     _dateDate () {
-      return this.date_.getDate()
+      return this.date_ ? this.date_.getDate() : -1
     },
     _dateHour () {
-      return this.date_.getHours()
+      return this.date_ ? this.date_.getHours() : -1
     },
     _dateMinute () {
-      return this.date_.getMinutes()
+      return this.date_ ? this.date_.getMinutes() : -1
     }
   }
 }
