@@ -16,7 +16,7 @@ npm run dev
 ### 安装
 
 ```
-npm i -S df-datetimepicker
+npm i -S df_datetimepicker
 ```
 
 ### 引用
@@ -30,7 +30,7 @@ npm i -S df-datetimepicker
   </div>
 </template>
 <script>
-import dfDatetimepicker from 'df-datetimepicker'
+import dfDatetimepicker from 'df_datetimepicker'
 export default {
   ...
   components: {
