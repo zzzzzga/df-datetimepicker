@@ -1,7 +1,7 @@
 <template>
   <div :class="[disabled ? 'disabled' : '']" class="df-calandar">
     <input ref="dropdownInput" :class="[disabled ? 'disabled' : '']" class="df-input" :disabled="disabled" :readonly="readonly" @focus="openCalandar" type="text"  v-model="dateStr" :placeholder="placeholder" />
-    <div ref="dropdownMenu" class="dropdown-menu" v-show="isShow">
+    <div ref="dropdownMenu" class="df-dropdown-menu" v-show="isShow">
       <div style="position: relative;">
         <div class="dropdown-header">
           <span @click="clickLeft" :class="[canPreDate?'shadow':'disabled']" class="dropdown-header_left"></span>
@@ -489,7 +489,7 @@ export default {
   .shadow:hover {
     background-color: #eee;
   }
-  .dropdown-menu {
+  .df-dropdown-menu {
     position: absolute;
     min-width: 160px;
     border: 1px solid rgba(0,0,0,.2);
@@ -499,7 +499,7 @@ export default {
     top: 35px;
     left: 0px;
   }
-  .dropdown-menu::before {
+  .df-dropdown-menu::before {
     top: -7px;
     left: 6px;
     position: absolute;
@@ -510,7 +510,7 @@ export default {
     border-bottom-color: rgba(0,0,0,.2);
     border-left: 7px solid transparent;
   }
-  .dropdown-menu::after {
+  .df-dropdown-menu::after {
     top: -6px;
     left: 7px;
     position: absolute;
