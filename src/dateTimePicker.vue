@@ -79,7 +79,7 @@ export default {
         })
     }).$children[0]
     document.addEventListener('click', this.handleClose)
-    this.setDate_()
+    this.panel.setDate_()
     this.dateStr = this.value
   },
   destroyed () {
