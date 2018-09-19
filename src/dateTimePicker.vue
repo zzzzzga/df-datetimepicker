@@ -79,6 +79,17 @@ export default {
         })
     }).$children[0]
     document.addEventListener('click', this.handleClose)
+    const that = this
+    const old = window.onresize
+    window.onresize = function () {
+      if (typeof old === 'function') old()
+      that.changePos()
+    }
+    const old2 = window.onscroll
+    window.onscroll = function () {
+      if (typeof old2 === 'function') old2()
+      that.changePos()
+    }
     this.panel.setDate_()
     this.dateStr = this.value
   },
@@ -86,6 +97,12 @@ export default {
     document.removeEventListener('click', this.handleClose)
   },
   methods: {
+    changePos(){
+      const inputPos = this.$refs.dropdownInput.getBoundingClientRect()
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+      this.panel.top = scrollTop + inputPos.y + inputPos.height + 7
+      this.panel.left = inputPos.x - 8
+    },
     handleClose (e) {
       var path = e.path
       for (let i = 0; i < path.length; i++) {
@@ -94,9 +111,7 @@ export default {
       this.panel.isShow = false
     },
     openCalandar (e) {
-      const input = e.path[0]
-      this.panel.top = input.offsetHeight + input.offsetTop + 7
-      this.panel.left = input.offsetLeft - 8
+      this.changePos()
       if (!this.panel.dateStr) {
         this.panel.date = new Date()
         this.panel.setDate_()
@@ -123,20 +138,21 @@ export default {
     border-radius: 4px;
     padding: 5px 8px;
   }
-  .disabled {
-    cursor:not-allowed;
-    background-color: #eee;
-  }
   .df-input {
     height: 20px;
     font-size: 13px;
     outline:none;
     border: none;
     width: 100%;
+    background-color: #fff;
   }
   .df-calandar:focus {
     border: 1px solid #145ccd;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(20,92,205,.6);
+  }
+  .disabled {
+    cursor:not-allowed;
+    background-color: #eee;
   }
 </style>
 

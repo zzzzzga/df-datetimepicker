@@ -433,26 +433,9 @@ export default {
 </script>
 
 <style scoped>
-  .df-calandar{
-    /* position: relative; */
-    border: 1px solid #DBDBDB;
-    border-radius: 4px;
-    padding: 5px 8px;
-  }
   .disabled {
     cursor:not-allowed;
     background-color: #eee;
-  }
-  .df-input {
-    height: 20px;
-    font-size: 13px;
-    outline:none;
-    border: none;
-    width: 100%;
-  }
-  .df-calandar:focus {
-    border: 1px solid #145ccd;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(20,92,205,.6);
   }
   .font-blod {
     font-weight: bold;
@@ -468,7 +451,7 @@ export default {
     min-width: 160px;
     border: 1px solid rgba(0,0,0,.2);
     margin: 1px;
-    width: 190px;
+    width: 192px;
     border-radius: 3px;
     background-color: #fff;
   }
