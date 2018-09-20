@@ -1,6 +1,6 @@
 {
-  "name": "df_datetimepicker",
-  "version": "0.0.5",
+  "name": "df_datetimepicker2",
+  "version": "0.0.13",
   "description": "",
   "main": "dist/bundle.min.js",
   "scripts": {
@@ -12,8 +12,8 @@
   "license": "MIT",
   "bugs": "https://github.com/zzzzzga/df-datetimepicker/issues",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/zzzzzga/df-datetimepicker"
+    "type": "git",
+    "url": "https://github.com/zzzzzga/df-datetimepicker"
   },
   "devDependencies": {
     "babel": "^6.23.0",
@@ -33,6 +33,7 @@
     "webpack-dev-server": "^3.1.8"
   },
   "dependencies": {
-    "vue": "^2.5.17"
+    "vue": "^2.5.17",
+    "vue-popperjs": "^1.5.0"
   }
 }

@@ -1,70 +1,80 @@
 <template>
   <div :class="[disabled ? 'disabled' : '']" class="df-calandar">
-    <input ref="dropdownInput" :class="[disabled ? 'disabled' : '']" class="df-input" :disabled="disabled" :readonly="readonly" @focus="openCalandar" type="text"  v-model="dateStr" :placeholder="placeholder" />
-    <div ref="dropdownMenu" class="df-dropdown-menu" v-show="isShow">
-      <div style="position: relative;">
-        <div class="dropdown-header">
-          <span @click="clickLeft" :class="[canPreDate?'shadow':'disabled']" class="dropdown-header_left"></span>
-          <span @click="clickCenter" class="dropdown-header_center shadow">{{showTitle}}</span>
-          <span @click="clickRight" :class="[canNextDate?'shadow':'disabled']" class="dropdown-header_right"></span>
-        </div>
-        <div class="dropdown-context">
-          <div v-if="status === 'date'">
-            <div v-for="(val, index) in new Array(7)" :key="val">
-              <div v-if="index == 0">
-                <div class="date font-blod" v-for="week in weeks" :key="week">
-                  {{week}}
+    <popper ref="popper" trigger="click" :options="{placement: 'bottom-start'}" append-to-body boundariesSelector="html" :visibleArrow="false">
+      <div class="popper">
+        <div ref="dropdownMenu" class="df-dropdown-menu">
+          <div style="position: relative;">
+            <div class="df-dropdown-header">
+              <span @click="clickLeft" :class="[canPreDate?'shadow':'disabled']" class="dropdown-header_left"></span>
+              <span @click="clickCenter" class="dropdown-header_center shadow">{{showTitle}}</span>
+              <span @click="clickRight" :class="[canNextDate?'shadow':'disabled']" class="dropdown-header_right"></span>
+            </div>
+            <div class="dropdown-context">
+              <div v-if="status === 'date'">
+                <div v-for="(val, index) in new Array(7)" :key="val">
+                  <div v-if="index == 0">
+                    <div class="date font-blod" v-for="week in weeks" :key="week">
+                      {{week}}
+                    </div>
+                  </div>
+                  <div v-else>
+                    <div @click="chooseDate(day)"
+                      :style="day.active ? '':'border-radius: 0px'"
+                      :class="[dateYear === now.getFullYear() && dateMonth === now.getMonth() 
+                      && day.getDate() === now.getDate() ? 'today':'',
+                      day.getFullYear() === _dateYear && day.getMonth() === _dateMonth 
+                      && day.getDate() === _dateDate ? 'active':'', day.active ? 'shadow' : 'disabled',
+                      isCurrentMonth(day) && day.active ? '' : 'font-color_hui', 'date']"
+                        v-for="day in getCurrentLineDate(index)" :key="day.getDate()">
+                        {{day.getDate()}}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div v-else>
-                <div @click="chooseDate(day)"
-                  :style="day.active ? '':'border-radius: 0px'"
-                  :class="[dateYear === now.getFullYear() && dateMonth === now.getMonth() 
-                  && day.getDate() === now.getDate() ? 'today':'',
-                  day.getFullYear() === _dateYear && day.getMonth() === _dateMonth 
-                  && day.getDate() === _dateDate ? 'active':'', day.active ? 'shadow' : 'disabled',
-                  isCurrentMonth(day) && day.active ? '' : 'font-color_hui', 'date']"
-                    v-for="day in getCurrentLineDate(index)" :key="day.getDate()">
-                    {{day.getDate()}}
+
+              <div class="flex-container" v-if="status === 'month'">
+                <div @click="chooseMonth(index)" class="flex-part shadow" 
+                  :class="[dateYear === _dateYear && index === _dateMonth ? 'active':'']" 
+                  v-for="(val, index) in months" :key="val">{{val}}</div>
+              </div>
+
+              <div class="flex-container" v-if="status === 'year'">
+                <div @click="chooseYear(val.year)" class="flex-part shadow" :class="[val.classHui ? 'font-color_hui' : '', val.year === now.getFullYear() ? 'active':'']" v-for="(val) in showYear" :key="val.year">
+                  {{val.year}}
+                </div>
+              </div>
+
+              <div class="flex-container" v-if="status === 'hour'">
+                <div @click="chooseHour(val.hourNum)" class="flex-part flex-part-2 shadow" :class="[val.active ? 'active' : '']" v-for="(val) in showHour" :key="val.hour">
+                  {{val.hour}}
+                </div>
+              </div>
+
+              <div class="flex-container" v-if="status === 'minute'">
+                <div @click="chooseMinute(val.minuteNum)" class="flex-part flex-part-2 shadow" :class="[val.active ? 'active' : '']" v-for="(val) in showMinute" :key="val.minute">
+                  {{val.minute}}
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="flex-container" v-if="status === 'month'">
-            <div @click="chooseMonth(index)" class="flex-part shadow" 
-              :class="[dateYear === _dateYear && index === _dateMonth ? 'active':'']" 
-              v-for="(val, index) in months" :key="val">{{val}}</div>
-          </div>
-
-          <div class="flex-container" v-if="status === 'year'">
-            <div @click="chooseYear(val.year)" class="flex-part shadow" :class="[val.classHui ? 'font-color_hui' : '', val.year === now.getFullYear() ? 'active':'']" v-for="(val) in showYear" :key="val.year">
-              {{val.year}}
+            <div class="dropdown-footer">
+              <div @click="toToday" :class="[canToday?'shadow':'disabled font-color_hui']" class="dropdown-today">今日</div>
             </div>
           </div>
-
-          <div class="flex-container" v-if="status === 'hour'">
-            <div @click="chooseHour(val.hourNum)" class="flex-part flex-part-2 shadow" :class="[val.active ? 'active' : '']" v-for="(val) in showHour" :key="val.hour">
-              {{val.hour}}
-            </div>
-          </div>
-
-          <div class="flex-container" v-if="status === 'minute'">
-            <div @click="chooseMinute(val.minuteNum)" class="flex-part flex-part-2 shadow" :class="[val.active ? 'active' : '']" v-for="(val) in showMinute" :key="val.minute">
-              {{val.minute}}
-            </div>
-          </div>
-        </div>
-        <div class="dropdown-footer">
-          <div @click="toToday" :class="[canToday?'shadow':'disabled font-color_hui']" class="dropdown-today">今日</div>
         </div>
       </div>
-    </div>
+      <input slot="reference" ref="dropdownInput" :class="[disabled ? 'disabled' : '']" class="df-input" :disabled="disabled" :readonly="readonly" @focus="openCalandar" type="text"  v-model="dateStr" :placeholder="placeholder" />
+    </popper>
+    
   </div>
 </template>
 <script>
+import Popper from 'vue-popperjs';
+import 'vue-popperjs/dist/css/vue-popper.css';
 export default {
   name: 'dateTimePicker',
+  components:{
+    Popper
+  },
   props: {
     value: {
       type: String,
@@ -103,7 +113,7 @@ export default {
   },
   data () {
     return {
-      isShow: false,
+      // isShow: false,
       dateStr: '',
       date: new Date(),
       now: new Date(),
@@ -113,12 +123,12 @@ export default {
     }
   },
   mounted () {
-    document.addEventListener('click', this.handleClose)
+    // document.addEventListener('click', this.handleClose)
     this.setDate_()
     this.dateStr = this.value
   },
   destroyed () {
-    document.removeEventListener('click', this.handleClose)
+    // document.removeEventListener('click', this.handleClose)
   },
   methods: {
     handleClose (e) {
@@ -126,7 +136,8 @@ export default {
       for (let i = 0; i < path.length; i++) {
         if (this.$refs['dropdownMenu'] === path[i] || this.$refs['dropdownInput'] === path[i]) return
       }
-      this.isShow = false
+      // this.isShow = false
+      this.$refs.popper.showPopper = false
     },
     // 获得当前行的日期
     getCurrentLineDate (index) {
@@ -257,7 +268,8 @@ export default {
       }
       this.dateStr = this.dateFormat(this.date, this.dateFormatStr)
       this.$emit('change', this.dateStr)
-      this.isShow = false
+      // this.isShow = false
+      this.$refs.popper.showPopper = false
     },
     toToday () {
       if (!this.canToday) return
@@ -265,7 +277,8 @@ export default {
       this.date_ = new Date()
       this.dateStr = this.dateFormat(this.date, this.dateFormatStr)
       this.$emit('change', this.dateStr)
-      this.isShow = false
+      // this.isShow = false
+      this.$refs.popper.showPopper = false
     },
     setDate_ () {
       if (this.defaultSelectNow) {
@@ -287,7 +300,8 @@ export default {
             this.date_ = new Date(this.date)
         }
       }
-      this.isShow = true
+      // this.isShow = true
+      // this.$refs.popper.showPopper = true
       this.status = 'date'
     },
     isRange (day) {
@@ -459,22 +473,17 @@ export default {
 </script>
 
 <style scoped>
-  .df-calandar{
-    position: relative;
-    border: 1px solid #DBDBDB;
-    border-radius: 4px;
-    padding: 5px 8px;
-  }
   .disabled {
     cursor:not-allowed;
     background-color: #eee;
   }
   .df-input {
+    border: 1px solid #DBDBDB;
+    border-radius: 4px;
+    padding: 5px 8px;
     height: 20px;
     font-size: 13px;
     outline:none;
-    border: none;
-    width: 100%;
   }
   .df-calandar:focus {
     border: 1px solid #145ccd;
@@ -490,16 +499,13 @@ export default {
     background-color: #eee;
   }
   .df-dropdown-menu {
-    position: absolute;
     min-width: 160px;
-    border: 1px solid rgba(0,0,0,.2);
+    /* border: 1px solid rgba(0,0,0,.2); */
     margin: 1px;
     width: 190px;
     border-radius: 3px;
-    top: 35px;
-    left: 0px;
   }
-  .df-dropdown-menu::before {
+  /* .df-dropdown-menu::before {
     top: -7px;
     left: 6px;
     position: absolute;
@@ -519,8 +525,8 @@ export default {
     border-right: 6px solid transparent;
     border-bottom: 6px solid #fff;
     border-left: 6px solid transparent;
-  }
-  .dropdown-header {
+  } */
+  .df-dropdown-header {
     margin: 5px;
     height: 20px;
     font-size: 13px;
@@ -528,7 +534,7 @@ export default {
     line-height: 20px;
   }
   .dropdown-header_left, .dropdown-header_right {
-    width: 26px;
+    width: 25px;
     height: 20px;
     float: left;
     background: url('./assets/tiaozhuanjiantou.png') no-repeat center;
