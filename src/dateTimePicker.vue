@@ -296,6 +296,7 @@ export default {
       }
     },
     openCalandar () {
+      this.dateStr = this.value
       if (!this.dateStr) {
         this.date = new Date()
         this.setDate_()
