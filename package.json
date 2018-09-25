@@ -1,6 +1,6 @@
 {
   "name": "df_datetimepicker2",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "",
   "main": "dist/bundle.min.js",
   "scripts": {

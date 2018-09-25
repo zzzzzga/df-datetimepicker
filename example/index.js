@@ -14,5 +14,5 @@ new Vue({
       console.log('++++++++++++++++++++++++++' + value)
     }
   },
-  template: '<DateTimePicker :value="value" @change="change" />'
+  template: '<DateTimePicker :value="value" @change="change">111111</DateTimePicker>'
 })

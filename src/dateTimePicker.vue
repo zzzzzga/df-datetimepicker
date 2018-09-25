@@ -1,6 +1,6 @@
 <template>
   <div :class="[disabled ? 'disabled' : '']" class="df-calandar">
-    <popper ref="popper" trigger="click" :options="{placement: 'bottom-start'}" append-to-body boundariesSelector="html" :visibleArrow="false">
+    <popper @show="openCalandar" ref="popper" trigger="click" :options="{placement: 'bottom-start'}" append-to-body boundariesSelector="html" :visibleArrow="false">
       <div class="popper">
         <div ref="dropdownMenu" class="df-dropdown-menu">
           <div style="position: relative;">
@@ -62,7 +62,11 @@
           </div>
         </div>
       </div>
-      <input slot="reference" ref="dropdownInput" :class="[disabled ? 'disabled' : '']" class="df-input" :disabled="disabled" :readonly="readonly" @focus="openCalandar" type="text"  v-model="dateStr" :placeholder="placeholder" />
+      <div slot="reference">
+        <slot>
+          <input ref="dropdownInput" :class="[disabled ? 'disabled' : '']" class="df-input" :disabled="disabled" :readonly="readonly" type="text"  v-model="dateStr" :placeholder="placeholder" />
+        </slot>
+      </div>
     </popper>
     
   </div>
@@ -70,10 +74,14 @@
 <script>
 import Popper from 'vue-popperjs';
 import 'vue-popperjs/dist/css/vue-popper.css';
+// import { Input } from 'element-ui';
+// import Vue from 'vue';
+
 export default {
   name: 'dateTimePicker',
   components:{
-    Popper
+    Popper,
+    // Input
   },
   props: {
     value: {
